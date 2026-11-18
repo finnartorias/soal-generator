@@ -25,6 +25,16 @@ class LocalSoalGeneratorService
      */
     public function getAvailableLocalModels(): array
     {
+        // Di lingkungan Vercel / Serverless cloud, lewati pencarian port lokal agar respons instan
+        if (app()->environment('production') || isset($_SERVER['VERCEL']) || env('VERCEL') || str_contains(request()->header('host', ''), 'vercel.app')) {
+            return [
+                'available' => false,
+                'models' => [],
+                'endpoint' => $this->ollamaBaseUrl,
+                'lmstudio_available' => false,
+            ];
+        }
+
         $ollamaModels = [];
         $ollamaAvailable = false;
 

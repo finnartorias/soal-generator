@@ -10,14 +10,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
         
         /* Custom scrollbar untuk list berkas & tabel */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .touch-scroll {
+            -webkit-overflow-scrolling: touch;
+        }
 
         @media screen {
             .print-only { display: none !important; }
@@ -209,34 +213,35 @@
         $hasResults = isset($results) && !empty($results['questions']);
     @endphp
 
-    <!-- Header Navbar Formal & Minimalis -->
+    <!-- Header Navbar Formal & Responsif Mobile -->
     <header class="bg-white border-b border-slate-200/90 sticky top-0 z-30 shadow-xs no-print">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3.5">
-                <div class="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-sm shadow-xs">
-                    <svg class="w-5 h-5 text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 min-h-[3.75rem] flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-2.5 sm:space-x-3.5 min-w-0">
+                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-sm shadow-xs flex-shrink-0">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                 </div>
-                <div>
-                    <div class="flex items-center space-x-2">
-                        <h1 class="text-base font-bold text-slate-900 tracking-tight">Generator Soal & Bank Asesmen</h1>
-                        <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                            Moda Mandiri (Lokal)
+                <div class="min-w-0">
+                    <div class="flex items-center space-x-1.5 sm:space-x-2">
+                        <h1 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight truncate">Generator Soal & Bank Asesmen</h1>
+                        <span class="hidden md:inline-flex px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 flex-shrink-0">
+                            Moda Mandiri
                         </span>
                     </div>
-                    <p class="text-xs text-slate-500">Penyusun instrumen evaluasi pembelajaran berbasis materi terpadu</p>
+                    <p class="hidden sm:block text-xs text-slate-500 truncate">Penyusun instrumen evaluasi pembelajaran berbasis materi terpadu</p>
                 </div>
             </div>
 
             <!-- Action Controls di Header -->
-            <div class="flex items-center space-x-2.5">
+            <div class="flex items-center space-x-2 flex-shrink-0">
                 @if($hasResults)
-                    <button type="button" onclick="openSidebar()" class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition">
-                        <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                        <span>Atur Materi & Parameter</span>
+                    <button type="button" onclick="openSidebar()" class="inline-flex items-center space-x-1.5 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold shadow-xs transition">
+                        <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                        <span class="hidden sm:inline">Atur Materi & Parameter</span>
+                        <span class="sm:hidden">Parameter</span>
                     </button>
                 @endif
 
-                <div class="hidden sm:flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200">
+                <div class="hidden lg:flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span>
                     Standar Anti-Klise Aktif
                 </div>
@@ -245,10 +250,10 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 {{ $hasResults ? 'pb-20 sm:pb-6' : '' }}">
 
         @if(session('status'))
-            <div class="mb-5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs sm:text-sm flex items-center justify-between shadow-xs no-print">
+            <div class="mb-4 sm:mb-5 p-3 sm:p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs sm:text-sm flex items-center justify-between shadow-xs no-print">
                 <div class="flex items-center space-x-2.5">
                     <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                     <span>{{ session('status') }}</span>
@@ -258,7 +263,7 @@
         @endif
 
         @if(isset($errors) && $errors->any())
-            <div class="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs sm:text-sm shadow-xs no-print">
+            <div class="mb-4 sm:mb-5 p-3 sm:p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs sm:text-sm shadow-xs no-print">
                 <div class="font-bold mb-1">Perhatian:</div>
                 <ul class="list-disc list-inside space-y-0.5 text-xs text-rose-800">
                     @foreach($errors->all() as $err)
@@ -272,39 +277,39 @@
             <!-- ========================================================================= -->
             <!-- TAMPILAN SETELAH GENERATE: HASIL SOAL FULL-WIDTH DENGAN SIDEBAR TERSEMBUNYI -->
             <!-- ========================================================================= -->
-            <div class="space-y-6">
+            <div class="space-y-4 sm:space-y-6">
 
                 <!-- Action Bar & Ringkasan Paket Soal -->
-                <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
+                <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 no-print">
                     <div class="space-y-1">
                         <div class="flex items-center space-x-2">
-                            <h2 class="text-lg font-bold text-slate-900">Naskah Paket Soal Terverifikasi</h2>
-                            <span class="px-2 py-0.5 text-[11px] font-semibold rounded bg-slate-100 text-slate-700 border border-slate-200">
-                                {{ count($results['questions']) }} Butir Soal
+                            <h2 class="text-base sm:text-lg font-bold text-slate-900">Naskah Paket Soal Terverifikasi</h2>
+                            <span class="px-2 py-0.5 text-[11px] font-semibold rounded bg-slate-100 text-slate-700 border border-slate-200 flex-shrink-0">
+                                {{ count($results['questions']) }} Butir
                             </span>
                         </div>
-                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+                        <div class="flex flex-wrap items-center gap-x-2.5 sm:gap-x-4 gap-y-1 text-[11px] sm:text-xs text-slate-500">
                             <span>Mesin: <strong class="text-slate-700 font-medium">{{ $results['engine_used'] }}</strong></span>
-                            <span>•</span>
-                            <span>Cakupan Materi: <strong class="text-slate-700 font-medium">{{ $results['material_stats']['target_percentage'] }}% ({{ $results['material_stats']['words_sampled'] }} kata)</strong></span>
-                            <span>•</span>
-                            <span>Tingkat Kognitif: <strong class="text-slate-700 font-medium">Bloom C2–C5 (HOTS)</strong></span>
+                            <span class="text-slate-300">•</span>
+                            <span>Cakupan: <strong class="text-slate-700 font-medium">{{ $results['material_stats']['target_percentage'] }}% ({{ $results['material_stats']['words_sampled'] }} kata)</strong></span>
+                            <span class="text-slate-300 hidden sm:inline">•</span>
+                            <span class="hidden sm:inline">Tingkat Kognitif: <strong class="text-slate-700 font-medium">Bloom C2–C5 (HOTS)</strong></span>
                         </div>
                     </div>
 
                     <!-- Tombol Kelola & Ekspor -->
-                    <div class="flex flex-wrap items-center gap-2">
-                        <button type="button" onclick="openSidebar()" class="px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition flex items-center space-x-1.5">
+                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
+                        <button type="button" onclick="openSidebar()" class="col-span-2 sm:col-span-1 min-h-[40px] px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold shadow-xs transition flex items-center justify-center space-x-1.5">
                             <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             <span>Ubah Input Materi</span>
                         </button>
 
                         <!-- Ekspor Format XLSX (Excel Sesuai Template Bank Soal Sekolah) -->
-                        <form action="{{ route('generator.export') }}" method="POST" class="inline">
+                        <form action="{{ route('generator.export') }}" method="POST" class="col-span-2 sm:col-span-1 inline">
                             @csrf
                             <input type="hidden" name="questions_data" value="{{ json_encode($results['questions']) }}">
                             <input type="hidden" name="format" value="xlsx">
-                            <button type="submit" class="px-3.5 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow-xs transition flex items-center space-x-1.5" title="Ekspor berkas spreadsheet Microsoft Excel (.xlsx) sesuai template resmi bank soal sekolah">
+                            <button type="submit" class="w-full min-h-[40px] px-3.5 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white text-xs font-semibold shadow-xs transition flex items-center justify-center space-x-1.5" title="Ekspor berkas spreadsheet Microsoft Excel (.xlsx) sesuai template resmi bank soal sekolah">
                                 <svg class="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 <span>Simpan XLSX (Excel)</span>
                             </button>
@@ -315,7 +320,7 @@
                             @csrf
                             <input type="hidden" name="questions_data" value="{{ json_encode($results['questions']) }}">
                             <input type="hidden" name="format" value="csv">
-                            <button type="submit" class="px-2.5 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-xs font-semibold text-slate-700 transition shadow-xs flex items-center space-x-1" title="Unduh format .CSV">
+                            <button type="submit" class="w-full min-h-[40px] px-2.5 py-2 rounded-lg bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-700 transition shadow-xs flex items-center justify-center space-x-1" title="Unduh format .CSV">
                                 <span>.CSV</span>
                             </button>
                         </form>
@@ -324,77 +329,77 @@
                             @csrf
                             <input type="hidden" name="questions_data" value="{{ json_encode($results['questions']) }}">
                             <input type="hidden" name="format" value="txt">
-                            <button type="submit" class="px-3 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-xs font-semibold text-slate-700 transition shadow-xs flex items-center space-x-1.5">
+                            <button type="submit" class="w-full min-h-[40px] px-3 py-2 rounded-lg bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-700 transition shadow-xs flex items-center justify-center space-x-1.5">
                                 <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                <span>Unduh (.TXT)</span>
+                                <span>.TXT</span>
                             </button>
                         </form>
 
-                        <button onclick="copyAllQuestions()" class="px-3 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-xs font-semibold text-slate-700 transition shadow-xs flex items-center space-x-1.5">
+                        <button onclick="copyAllQuestions()" class="col-span-1 min-h-[40px] px-3 py-2 rounded-lg bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-700 transition shadow-xs flex items-center justify-center space-x-1.5">
                             <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                            <span id="copyBtnText">Salin Semua</span>
+                            <span id="copyBtnText">Salin</span>
                         </button>
 
-                        <button onclick="window.print()" class="px-3 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-xs font-semibold text-slate-700 transition shadow-xs flex items-center space-x-1.5">
+                        <button onclick="window.print()" class="col-span-1 sm:col-span-1 min-h-[40px] px-3 py-2 rounded-lg bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-700 transition shadow-xs flex items-center justify-center space-x-1.5">
                             <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H9v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                            <span>Cetak / Simpan PDF</span>
+                            <span>Cetak PDF</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Daftar Naskah Soal -->
-                <div class="space-y-4 max-w-5xl mx-auto">
+                <div class="space-y-3 sm:space-y-4 max-w-5xl mx-auto">
                     @foreach($results['questions'] as $q)
-                        <div class="question-card bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+                        <div class="question-card bg-white rounded-xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-3 sm:space-y-4">
                             <!-- Header Item Soal -->
-                            <div class="question-header flex items-center justify-between pb-3 border-b border-slate-100">
-                                <div class="flex items-center space-x-2.5">
-                                    <span class="w-7 h-7 rounded-md bg-slate-900 text-white font-bold text-xs flex items-center justify-center print:hidden">
+                            <div class="question-header flex flex-wrap items-center justify-between gap-2 pb-2.5 sm:pb-3 border-b border-slate-100">
+                                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2.5">
+                                    <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-slate-900 text-white font-bold text-xs flex items-center justify-center print:hidden flex-shrink-0">
                                         {{ $q['number'] }}
                                     </span>
                                     <span class="question-number hidden print:inline">
                                         {{ $q['number'] }}.
                                     </span>
-                                    <span class="question-badge px-2 py-0.5 rounded text-[11px] font-semibold border {{ $q['type'] === 'pilihan_ganda' ? 'bg-slate-50 text-slate-700 border-slate-200' : 'bg-amber-50 text-amber-800 border-amber-200' }}">
+                                    <span class="question-badge px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-semibold border {{ $q['type'] === 'pilihan_ganda' ? 'bg-slate-50 text-slate-700 border-slate-200' : 'bg-amber-50 text-amber-800 border-amber-200' }}">
                                         {{ $q['type'] === 'pilihan_ganda' ? 'PILIHAN GANDA' : 'ESAI ANALITIS' }}
                                     </span>
-                                    <span class="text-xs text-slate-500 font-medium print:text-[10pt] print:text-slate-600">
+                                    <span class="text-[11px] sm:text-xs text-slate-500 font-medium print:text-[10pt] print:text-slate-600">
                                         ({{ $q['bloom_level'] ?? 'Tingkat Kognitif HOTS' }})
                                     </span>
                                 </div>
-                                <span class="text-[11px] text-slate-400 font-medium no-print">
+                                <span class="hidden sm:inline text-[11px] text-slate-400 font-medium no-print">
                                     Standar Bebas Klise
                                 </span>
                             </div>
 
                             <!-- Batang Soal (Pertanyaan) -->
-                            <div class="question-stem text-base text-slate-900 font-medium leading-relaxed">
+                            <div class="question-stem text-sm sm:text-base text-slate-900 font-medium leading-relaxed break-words">
                                 {{ $q['question'] }}
                             </div>
 
                             <!-- Tabel Potongan Kode Bernomor Baris (Jika Ada Kodingan) -->
                             @if(!empty($q['code_snippet']))
-                                <div class="code-table-container my-3 rounded-lg border border-slate-800 bg-slate-900 text-slate-100 overflow-hidden shadow-xs">
-                                    <div class="code-table-header px-3.5 py-1.5 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between text-xs">
+                                <div class="code-table-container my-2 sm:my-3 rounded-lg border border-slate-800 bg-slate-900 text-slate-100 overflow-hidden shadow-xs">
+                                    <div class="code-table-header px-3 sm:px-3.5 py-1.5 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between text-xs">
                                         <div class="flex items-center space-x-2">
                                             <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-slate-800 text-slate-300">
                                                 {{ strtoupper($q['code_lang'] ?? 'KODE PROGRAM') }}
                                             </span>
-                                            <span class="text-[11px] text-slate-400 font-mono">Tabel Baris Kode Program</span>
+                                            <span class="text-[10px] sm:text-[11px] text-slate-400 font-mono">Tabel Baris Kode</span>
                                         </div>
-                                        <button type="button" onclick="copySnippet(this)" class="no-print px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-mono transition">
+                                        <button type="button" onclick="copySnippet(this)" class="no-print px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 hover:text-white text-[10px] sm:text-[11px] font-mono transition">
                                             Salin Kode
                                         </button>
                                     </div>
-                                    <div class="overflow-x-auto max-h-80 print:max-h-none print:overflow-visible">
-                                        <table class="code-table w-full text-left border-collapse font-mono text-xs">
+                                    <div class="overflow-x-auto touch-scroll max-h-80 print:max-h-none print:overflow-visible">
+                                        <table class="code-table w-full text-left border-collapse font-mono text-[11px] sm:text-xs">
                                             <tbody>
                                                 @foreach(explode("\n", rtrim($q['code_snippet'])) as $lineIndex => $line)
                                                     <tr class="code-row hover:bg-slate-800/40">
-                                                        <td class="code-line-number w-12 py-1 px-3 text-right text-slate-500 select-none bg-slate-950/40 border-r border-slate-800 text-[11px]">
+                                                        <td class="code-line-number w-9 sm:w-12 py-1 px-2 sm:px-3 text-right text-slate-500 select-none bg-slate-950/40 border-r border-slate-800 text-[10px] sm:text-[11px]">
                                                             {{ $lineIndex + 1 }}
                                                         </td>
-                                                        <td class="code-line-content py-1 px-4 text-emerald-300 whitespace-pre leading-relaxed select-text font-normal">{{ $line }}</td>
+                                                        <td class="code-line-content py-1 px-2.5 sm:px-4 text-emerald-300 whitespace-pre leading-relaxed select-text font-normal">{{ $line }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -405,9 +410,9 @@
 
                             <!-- Pilihan Jawaban (Jika Pilihan Ganda) -->
                             @if(!empty($q['options']))
-                                <div class="options-container grid grid-cols-1 gap-2 pt-1">
+                                <div class="options-container grid grid-cols-1 gap-1.5 sm:gap-2 pt-1">
                                     @foreach($q['options'] as $opt)
-                                        <div class="option-item p-3 rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700 bg-slate-50/40 hover:bg-white hover:border-slate-300 transition">
+                                        <div class="option-item p-2.5 sm:p-3 rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-700 bg-slate-50/40 hover:bg-white hover:border-slate-300 active:bg-slate-100 transition break-words select-text">
                                             {{ $opt }}
                                         </div>
                                     @endforeach
@@ -423,7 +428,7 @@
                                     </span>
                                     <span class="text-[11px] text-slate-400 font-normal">Buka rincian</span>
                                 </summary>
-                                <div class="mt-2.5 p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2">
+                                <div class="mt-2.5 p-3 sm:p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2 break-words">
                                     <div>
                                         <span class="font-bold text-slate-900">Kunci / Jawaban Target:</span>
                                         <span class="font-semibold text-emerald-800 ml-1">{{ $q['correct_answer'] }}</span>
@@ -449,10 +454,10 @@
             <!-- ========================================================================= -->
             <!-- TAMPILAN AWAL (BELUM GENERATE): FORMULIR INPUT TERBUKA DI TENGAH -->
             <!-- ========================================================================= -->
-            <div class="max-w-3xl mx-auto py-2">
-                <div class="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
+            <div class="max-w-3xl mx-auto py-1 sm:py-2">
+                <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-8 shadow-xs space-y-5 sm:space-y-6">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-900">Unggah Materi & Parameter Soal</h2>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900">Unggah Materi & Parameter Soal</h2>
                         <p class="text-xs text-slate-500 mt-0.5">Masukkan satu atau beberapa dokumen pembelajaran untuk dikonversi menjadi instrumen evaluasi terstandarisasi.</p>
                     </div>
 
@@ -464,27 +469,52 @@
     </main>
 
     <!-- ========================================================================= -->
+    <!-- STICKY MOBILE QUICK BAR: KELOLA & EKSPOR CEPAT DI PONSEL (HANYA LAYAR KECIL) -->
+    <!-- ========================================================================= -->
+    @if($hasResults)
+        <div class="sm:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 p-2.5 z-30 shadow-lg flex items-center gap-2 no-print">
+            <button type="button" onclick="openSidebar()" class="flex-1 py-2 px-2 rounded-lg bg-slate-900 text-white text-xs font-semibold flex items-center justify-center space-x-1 shadow-xs active:bg-slate-950">
+                <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                <span>Materi</span>
+            </button>
+            <form action="{{ route('generator.export') }}" method="POST" class="flex-1">
+                @csrf
+                <input type="hidden" name="questions_data" value="{{ json_encode($results['questions']) }}">
+                <input type="hidden" name="format" value="xlsx">
+                <button type="submit" class="w-full py-2 px-2 rounded-lg bg-emerald-700 text-white text-xs font-semibold flex items-center justify-center space-x-1 shadow-xs active:bg-emerald-800">
+                    <svg class="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span>Excel (.xlsx)</span>
+                </button>
+            </form>
+            <button onclick="window.print()" class="py-2 px-3 rounded-lg border border-slate-300 bg-white text-slate-700 text-xs font-semibold flex items-center justify-center shadow-xs active:bg-slate-100">
+                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H9v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <span class="ml-1">PDF</span>
+            </button>
+        </div>
+    @endif
+
+    <!-- ========================================================================= -->
     <!-- SLIDE-OVER SIDEBAR: PANEL MATERI & PENGATURAN (MUNCUL KETIKA DIBUTUHKAN) -->
     <!-- ========================================================================= -->
     @if($hasResults)
         <!-- Backdrop -->
-        <div id="sidebarBackdrop" onclick="closeSidebar()" class="fixed inset-0 bg-slate-900/40 z-40 backdrop-blur-xs transition-opacity duration-300 opacity-0 pointer-events-none no-print"></div>
+        <div id="sidebarBackdrop" onclick="closeSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 backdrop-blur-xs transition-opacity duration-300 opacity-0 pointer-events-none no-print"></div>
 
         <!-- Sidebar Drawer Panel -->
-        <aside id="sidebarPanel" class="fixed inset-y-0 left-0 z-50 w-full sm:w-[480px] bg-white shadow-xl border-r border-slate-200 flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out no-print">
+        <aside id="sidebarPanel" class="fixed inset-y-0 left-0 z-50 w-full sm:w-[480px] bg-white shadow-2xl border-r border-slate-200 flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out no-print">
             <!-- Sidebar Header -->
-            <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/70">
+            <div class="p-3.5 sm:p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
                 <div>
                     <h3 class="text-sm font-bold text-slate-900">Panel Materi & Parameter</h3>
                     <p class="text-xs text-slate-500">Sesuaikan berkas atau ubah konfigurasi soal</p>
                 </div>
-                <button type="button" onclick="closeSidebar()" class="w-8 h-8 rounded-lg hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center font-bold text-base transition">
+                <button type="button" onclick="closeSidebar()" class="w-9 h-9 rounded-lg hover:bg-slate-200 active:bg-slate-300 text-slate-500 hover:text-slate-800 flex items-center justify-center font-bold text-xl transition">
                     &times;
                 </button>
             </div>
 
             <!-- Sidebar Scrollable Body Form -->
-            <div class="flex-1 overflow-y-auto p-5 space-y-5">
+            <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 touch-scroll">
                 @include('generator_form_fields')
             </div>
         </aside>
@@ -497,7 +527,7 @@
 
     <!-- Shared JavaScript Logic -->
     <script>
-        // Toggle Sidebar Functions
+        // Toggle Sidebar Functions dengan Penguncian Scroll Mobile
         function openSidebar() {
             const sidebar = document.getElementById('sidebarPanel');
             const backdrop = document.getElementById('sidebarBackdrop');
@@ -505,6 +535,7 @@
                 backdrop.classList.remove('opacity-0', 'pointer-events-none');
                 backdrop.classList.add('opacity-100', 'pointer-events-auto');
                 sidebar.classList.remove('-translate-x-full');
+                document.body.classList.add('overflow-hidden');
             }
         }
 
@@ -515,6 +546,7 @@
                 backdrop.classList.remove('opacity-100', 'pointer-events-auto');
                 backdrop.classList.add('opacity-0', 'pointer-events-none');
                 sidebar.classList.add('-translate-x-full');
+                document.body.classList.remove('overflow-hidden');
             }
         }
 

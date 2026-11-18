@@ -7,7 +7,7 @@
             Berkas Dokumen Materi
         </label>
 
-        <div class="rounded-xl border border-dashed border-slate-300 hover:border-slate-400 bg-slate-50/50 hover:bg-slate-50 p-5 text-center transition relative cursor-pointer" id="dropArea">
+        <div class="rounded-xl border border-dashed border-slate-300 hover:border-slate-400 bg-slate-50/50 hover:bg-slate-50 p-4 sm:p-5 text-center transition relative cursor-pointer" id="dropArea">
             <input type="file" id="material_file_picker" multiple
                 accept=".pdf,.docx,.doc,.pptx,.ppt,.xlsx,.xls,.csv,.zip,.rar,.png,.jpg,.jpeg,.webp,.bmp,.txt,.md" 
                 class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
@@ -19,11 +19,11 @@
                 <div class="w-10 h-10 rounded-lg bg-white border border-slate-200 text-slate-700 mx-auto flex items-center justify-center shadow-2xs">
                     <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                 </div>
-                <div class="text-xs font-semibold text-slate-800">
-                    Klik untuk memilih berkas <span class="font-normal text-slate-500">atau tarik ke sini</span>
+                <div class="text-xs sm:text-sm font-semibold text-slate-800">
+                    Sentuh / Klik untuk memilih berkas <span class="font-normal text-slate-500">atau tarik ke sini</span>
                 </div>
-                <div class="text-[11px] text-slate-400">
-                    PDF, DOCX, PPTX, XLSX, CSV, RAR, ZIP, atau Gambar (OCR) • Dapat ditambah berkali-kali
+                <div class="text-[10px] sm:text-[11px] text-slate-400">
+                    PDF, DOCX, PPTX, XLSX, CSV, RAR, ZIP, atau Gambar (OCR) • Bebas akumulasi banyak berkas
                 </div>
             </div>
         </div>
@@ -119,12 +119,12 @@
     </div>
 
     <!-- Konfigurasi Jumlah & Bentuk Soal -->
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
         <div>
             <label for="count" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
                 Jumlah Soal
             </label>
-            <select id="count" name="count" class="w-full px-2.5 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 bg-white font-medium">
+            <select id="count" name="count" class="w-full min-h-[42px] px-3 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 bg-white font-medium">
                 @foreach([3, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100] as $c)
                     <option value="{{ $c }}" {{ old('count', $inputs['count'] ?? 5) == $c ? 'selected' : '' }}>
                         {{ $c }} Butir Soal
@@ -137,7 +137,7 @@
             <label for="type" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
                 Bentuk Soal
             </label>
-            <select id="type" name="type" class="w-full px-2.5 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 bg-white font-medium">
+            <select id="type" name="type" class="w-full min-h-[42px] px-3 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 bg-white font-medium">
                 <option value="all" {{ old('type', $inputs['type'] ?? 'all') == 'all' ? 'selected' : '' }}>Campuran (PG & Esai)</option>
                 <option value="multiple_choice" {{ old('type', $inputs['type'] ?? 'all') == 'multiple_choice' ? 'selected' : '' }}>Pilihan Ganda</option>
                 <option value="essay" {{ old('type', $inputs['type'] ?? 'all') == 'essay' ? 'selected' : '' }}>Esai & Kasus</option>
@@ -151,7 +151,7 @@
             <span>Mesin Generator Soal</span>
             <span class="text-[10px] text-slate-500 font-normal">Offline & Lokal</span>
         </label>
-        <select id="model" name="model" class="w-full px-2.5 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 bg-white font-medium">
+        <select id="model" name="model" class="w-full min-h-[42px] px-3 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 bg-white font-medium">
             <optgroup label="Mesin Analitis Lokal (100% Standalone)">
                 <option value="offline_engine" {{ old('model', $inputs['model'] ?? '') == 'offline_engine' ? 'selected' : '' }}>
                     Mesin Heuristik Semantik (Kausalitas & Konsep)
@@ -187,7 +187,7 @@
     </div>
 
     <!-- Tombol Submit Formal -->
-    <button type="submit" id="btnSubmit" class="w-full py-2.5 px-4 rounded-lg font-semibold text-sm text-white bg-slate-900 hover:bg-slate-800 transition shadow-xs flex items-center justify-center space-x-2">
+    <button type="submit" id="btnSubmit" class="w-full min-h-[46px] py-3 sm:py-2.5 px-4 rounded-lg font-semibold text-sm sm:text-base text-white bg-slate-900 hover:bg-slate-800 active:bg-slate-950 active:scale-[0.99] transition shadow-xs flex items-center justify-center space-x-2 cursor-pointer">
         <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
         <span>Buat Instrumen Soal</span>
     </button>
