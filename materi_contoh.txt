@@ -1,0 +1,7 @@
+Fotosintesis merupakan proses biokimia yang dilakukan oleh tumbuhan hijau, alga, dan beberapa jenis bakteri untuk memproduksi energi berupa glukosa dengan memanfaatkan energi cahaya matahari. Proses ini berlangsung terutama di dalam kloroplas, organel sel yang mengandung pigmen klorofil.
+
+Fotosintesis terbagi menjadi dua tahapan utama, yaitu reaksi terang dan reaksi gelap (Siklus Calvin). Reaksi terang berlangsung di membran tilakoid dan membutuhkan keberadaan cahaya matahari secara langsung. Pada tahap ini, energi foton diserap oleh klorofil untuk memecah molekul air (fotolisis air), yang menghasilkan gas oksigen (O2) sebagai produk sampingan serta molekul berenergi tinggi yaitu ATP dan NADPH.
+
+Sebaliknya, reaksi gelap terjadi di stroma kloroplas dan tidak memerlukan cahaya secara langsung, meskipun tetap bergantung pada produk ATP dan NADPH yang dihasilkan dari reaksi terang. Dalam Siklus Calvin, enzim RuBisCO memfiksasi karbon dioksida (CO2) dari udara untuk diubah menjadi molekul gula berkarbon tiga (G3P), yang kemudian dirangkai menjadi glukosa.
+
+Faktor-faktor pembatas yang memengaruhi laju fotosintesis meliputi intensitas cahaya, konsentrasi karbon dioksida di atmosfer, suhu lingkungan, serta ketersediaan air tanah. Jika suhu melampaui batas optimum, enzim fotosintetik seperti RuBisCO akan mengalami denaturasi sehingga efisiensi fotosintesis menurun drastis.

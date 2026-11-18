@@ -1,0 +1,5 @@
+Topik,Komponen,Fungsi,Karakteristik
+Database Relasional,Primary Key,Mengidentifikasi setiap baris data secara unik,Tidak boleh bernilai NULL dan harus unik
+Database Relasional,Foreign Key,Membangun relasi antar tabel referensial,Menjaga integritas referensial data
+Database Relasional,Normalisasi,Mencegah anomali penyisipan dan redundansi,Terdiri dari bentuk 1NF 2NF dan 3NF
+Database Relasional,Index,Mempercepat pencarian data pada query SELECT,Membutuhkan ruang penyimpanan tambahan
