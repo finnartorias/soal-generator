@@ -135,7 +135,10 @@ class SoalGeneratorController extends Controller
             $totalSources = count($sourcesMetadata);
             $statusMsg = "Sukses memproses {$totalSources} sumber materi dan membuat " . count($results['questions']) . " butir soal dengan Anti-Slop filter.";
 
-            return redirect()->route('generator.index')->with([
+            $localStatus = $this->generatorService->getAvailableLocalModels();
+
+            return view('generator', [
+                'localStatus' => $localStatus,
                 'results' => $results,
                 'inputs' => [
                     'material' => $request->input('material', ''),

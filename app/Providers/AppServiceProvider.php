@@ -20,13 +20,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Enforce HTTPS di Vercel / Production agar form action dan asset konsisten HTTPS
+        // Enforce HTTPS & Konfigurasi Session File di Vercel Serverless
         if (
             app()->environment('production') ||
             (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
             str_contains(request()->header('host', ''), 'vercel.app')
         ) {
             URL::forceScheme('https');
+            config([
+                'session.driver' => 'file',
+                'session.files' => '/tmp/storage/framework/sessions',
+            ]);
         }
     }
 }

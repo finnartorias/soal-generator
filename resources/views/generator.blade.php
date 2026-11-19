@@ -252,11 +252,14 @@
     <!-- Main Content Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 {{ $hasResults ? 'pb-20 sm:pb-6' : '' }}">
 
-        @if(session('status'))
+        @php
+            $activeStatus = $status ?? session('status');
+        @endphp
+        @if(!empty($activeStatus))
             <div class="mb-4 sm:mb-5 p-3 sm:p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs sm:text-sm flex items-center justify-between shadow-xs no-print">
                 <div class="flex items-center space-x-2.5">
                     <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                    <span>{{ session('status') }}</span>
+                    <span>{{ $activeStatus }}</span>
                 </div>
                 <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800 font-bold ml-2 text-base">&times;</button>
             </div>
