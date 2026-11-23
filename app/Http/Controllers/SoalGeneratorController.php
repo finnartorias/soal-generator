@@ -34,6 +34,7 @@ class SoalGeneratorController extends Controller
                 'count' => 5,
                 'type' => 'all',
                 'material' => '',
+                'coding_mode' => 'none',
             ]),
             'materialsSummary' => session('materialsSummary'),
         ]);
@@ -59,6 +60,7 @@ class SoalGeneratorController extends Controller
             'count' => 'required|integer|min:1|max:100',
             'type' => 'required|in:all,multiple_choice,essay',
             'model' => 'nullable|string',
+            'coding_mode' => 'nullable|in:auto,none,code_only',
         ]);
 
         $combinedCorpusParts = [];
@@ -129,8 +131,9 @@ class SoalGeneratorController extends Controller
             $count = (int) $request->input('count', 5);
             $type = $request->input('type', 'all');
             $model = $request->input('model', 'offline_engine');
+            $codingMode = $request->input('coding_mode', 'none');
 
-            $results = $this->generatorService->generate($finalCorpus, $percentage, $count, $type, $model);
+            $results = $this->generatorService->generate($finalCorpus, $percentage, $count, $type, $model, $codingMode);
 
             $totalSources = count($sourcesMetadata);
             $statusMsg = "Sukses memproses {$totalSources} sumber materi dan membuat " . count($results['questions']) . " butir soal dengan Anti-Slop filter.";
@@ -147,6 +150,7 @@ class SoalGeneratorController extends Controller
                     'count' => $count,
                     'type' => $type,
                     'model' => $model,
+                    'coding_mode' => $codingMode,
                 ],
                 'materialsSummary' => [
                     'total_sources' => $totalSources,

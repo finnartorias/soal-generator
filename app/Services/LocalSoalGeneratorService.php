@@ -99,7 +99,8 @@ class LocalSoalGeneratorService
         int $percentage = 100,
         int $count = 5,
         string $type = 'all',
-        ?string $preferredEngine = 'offline_engine'
+        ?string $preferredEngine = 'offline_engine',
+        string $codingMode = 'auto'
     ): array {
         $count = max(1, min(100, $count));
         $coverageData = $this->chunker->extractCoverage($material, $percentage, 'distributed');
@@ -115,17 +116,17 @@ class LocalSoalGeneratorService
         // Deteksi jenis mesin yang dipilih user
         switch ($preferredEngine) {
             case 'bloom_engine':
-                $rawQuestions = $this->generateWithBloomTaxonomyEngine($sampledText, $count, $type);
+                $rawQuestions = $this->generateWithBloomTaxonomyEngine($sampledText, $count, $type, $codingMode);
                 $engineTitle = "Local Bloom Taxonomy Engine (Taksonomi Kognitif C2–C5)";
                 break;
 
             case 'case_study_engine':
-                $rawQuestions = $this->generateWithCaseStudyEngine($sampledText, $count, $type);
+                $rawQuestions = $this->generateWithCaseStudyEngine($sampledText, $count, $type, $codingMode);
                 $engineTitle = "Local Case-Study & Scenario Engine (Analisis Studi Kasus)";
                 break;
 
             case 'hybrid_ensemble':
-                $rawQuestions = $this->generateWithHybridEnsemble($sampledText, $count, $type);
+                $rawQuestions = $this->generateWithHybridEnsemble($sampledText, $count, $type, $codingMode);
                 $engineTitle = "Hybrid Multi-Engine Ensemble (Kombinasi Heuristik & Taksonomi Bloom)";
                 break;
 
@@ -134,7 +135,7 @@ class LocalSoalGeneratorService
                     $rawQuestions = $this->generateWithLocalOpenAI($sampledText, $count, $type);
                     $engineTitle = "Local LM Studio / Jan (OpenAI Compatible API :1234)";
                 } catch (\Throwable $e) {
-                    $rawQuestions = $this->generateWithHybridEnsemble($sampledText, $count, $type);
+                    $rawQuestions = $this->generateWithHybridEnsemble($sampledText, $count, $type, $codingMode);
                     $engineTitle = "Hybrid Multi-Engine (Fallback dari LM Studio: " . $e->getMessage() . ")";
                 }
                 break;
@@ -147,12 +148,12 @@ class LocalSoalGeneratorService
                         $rawQuestions = $this->generateWithOllama($sampledText, $count, $type, $preferredEngine);
                         $engineTitle = "Ollama Local LLM ({$preferredEngine})";
                     } catch (\Throwable $e) {
-                        $rawQuestions = $this->generateWithHybridEnsemble($sampledText, $count, $type);
+                        $rawQuestions = $this->generateWithHybridEnsemble($sampledText, $count, $type, $codingMode);
                         $engineTitle = "Hybrid Multi-Engine (Fallback dari Ollama: " . $e->getMessage() . ")";
                     }
                 } else {
                     // Default: Local Semantic Heuristic Engine
-                    $rawQuestions = $this->generateWithOfflineEngine($sampledText, $count, $type);
+                    $rawQuestions = $this->generateWithOfflineEngine($sampledText, $count, $type, $codingMode);
                     $engineTitle = "Local Semantic Heuristic Engine (HOTS & Kausalitas)";
                 }
                 break;
@@ -201,7 +202,7 @@ class LocalSoalGeneratorService
     /**
      * MESIN 1: Local Semantic Heuristic Engine (Kausalitas, Konsep, Fungsi)
      */
-    public function generateWithOfflineEngine(string $text, int $count, string $type): array
+    public function generateWithOfflineEngine(string $text, int $count, string $type, string $codingMode = 'auto'): array
     {
         $sentences = $this->chunker->splitSentences($text);
         if (empty($sentences)) {
@@ -212,7 +213,14 @@ class LocalSoalGeneratorService
         }
 
         $vocabulary = $this->extractKeyTerminology($text);
-        $progContext = $this->detectProgrammingContext($text);
+
+        // Atur konteks kodingan sesuai codingMode pilihan user
+        $progContext = match ($codingMode) {
+            'none' => null,
+            'code_only' => $this->detectProgrammingContext($text) ?? ['lang' => 'python', 'name' => 'Python / Pemrograman'],
+            default => $this->detectProgrammingContext($text),
+        };
+
         $questions = [];
 
         // Generate dengan variasi kognitif hingga mencapai jumlah target (s.d 100 soal)
@@ -226,8 +234,11 @@ class LocalSoalGeneratorService
 
             $isEssay = ($type === 'essay') || ($type === 'all' && ($i % 3 === 2));
 
-            // Jika materi memuat topik pemrograman/kodingan, buatkan soal kodingan bertabel
-            if ($progContext !== null && ($i % 2 === 1)) {
+            // Jika mode khusus kodingan (semua soal) ATAU mode otomatis (50% soal ganjil)
+            $shouldBeCoding = ($codingMode === 'code_only' && $progContext !== null)
+                           || ($codingMode === 'auto' && $progContext !== null && ($i % 2 === 1));
+
+            if ($shouldBeCoding) {
                 $q = $this->craftCodingQuestion($currentSentence, $progContext, $i, $isEssay ? 'essay' : 'multiple_choice', $vocabulary);
             } elseif ($isEssay) {
                 $q = $this->craftEssayByAngle($currentSentence, $angle, $text);
@@ -245,7 +256,7 @@ class LocalSoalGeneratorService
     /**
      * MESIN 2: Bloom Taxonomy Engine (Taksonomi Kognitif C2, C3, C4, C5)
      */
-    public function generateWithBloomTaxonomyEngine(string $text, int $count, string $type): array
+    public function generateWithBloomTaxonomyEngine(string $text, int $count, string $type, string $codingMode = 'auto'): array
     {
         $sentences = $this->chunker->splitSentences($text);
         if (empty($sentences)) {
@@ -256,7 +267,13 @@ class LocalSoalGeneratorService
         }
 
         $vocabulary = $this->extractKeyTerminology($text);
-        $progContext = $this->detectProgrammingContext($text);
+
+        $progContext = match ($codingMode) {
+            'none' => null,
+            'code_only' => $this->detectProgrammingContext($text) ?? ['lang' => 'python', 'name' => 'Python / Pemrograman'],
+            default => $this->detectProgrammingContext($text),
+        };
+
         $questions = [];
 
         $bloomLevels = [
@@ -274,8 +291,11 @@ class LocalSoalGeneratorService
 
             $isEssay = ($type === 'essay') || ($type === 'all' && ($i % 2 === 1));
 
-            // Jika ada konteks kodingan dan level C3/C4, buatkan soal kodingan bertabel
-            if ($progContext !== null && in_array($level['type'], ['application', 'analysis'])) {
+            // Jika kodingan aktif dan memenuhi kriteria
+            $shouldBeCoding = ($codingMode === 'code_only' && $progContext !== null)
+                           || ($codingMode === 'auto' && $progContext !== null && in_array($level['type'], ['application', 'analysis']));
+
+            if ($shouldBeCoding) {
                 $questions[] = $this->craftCodingQuestion($sentence, $progContext, $i, $isEssay ? 'essay' : 'multiple_choice', $vocabulary);
                 continue;
             }
@@ -317,7 +337,7 @@ class LocalSoalGeneratorService
     /**
      * MESIN 3: Case-Study & Scenario Engine (Studi Kasus Kontekstual & Pemecahan Masalah)
      */
-    public function generateWithCaseStudyEngine(string $text, int $count, string $type): array
+    public function generateWithCaseStudyEngine(string $text, int $count, string $type, string $codingMode = 'auto'): array
     {
         $sentences = $this->chunker->splitSentences($text);
         if (empty($sentences)) {
@@ -328,7 +348,13 @@ class LocalSoalGeneratorService
         }
 
         $vocabulary = $this->extractKeyTerminology($text);
-        $progContext = $this->detectProgrammingContext($text);
+
+        $progContext = match ($codingMode) {
+            'none' => null,
+            'code_only' => $this->detectProgrammingContext($text) ?? ['lang' => 'python', 'name' => 'Python / Pemrograman'],
+            default => $this->detectProgrammingContext($text),
+        };
+
         $questions = [];
 
         for ($i = 0; $i < $count; $i++) {
@@ -340,7 +366,10 @@ class LocalSoalGeneratorService
             $isEssay = ($type === 'essay') || ($type === 'all' && ($i % 2 === 1));
 
             // Jika ada konteks kodingan, selingi dengan studi kasus berbasis kode
-            if ($progContext !== null && ($i % 2 === 1)) {
+            $shouldBeCoding = ($codingMode === 'code_only' && $progContext !== null)
+                           || ($codingMode === 'auto' && $progContext !== null && ($i % 2 === 1));
+
+            if ($shouldBeCoding) {
                 $questions[] = $this->craftCodingQuestion($sentence, $progContext, $i, $isEssay ? 'essay' : 'multiple_choice', $vocabulary);
                 continue;
             }
@@ -373,15 +402,15 @@ class LocalSoalGeneratorService
      * MESIN 4: Hybrid Multi-Engine Ensemble (Kombinasi Heuristik, Kausalitas, Taksonomi Bloom & Skenario)
      * Mampu menghasilkan bank soal besar (hingga 100 butir) yang kaya variasi dan bebas repetisi.
      */
-    public function generateWithHybridEnsemble(string $text, int $count, string $type): array
+    public function generateWithHybridEnsemble(string $text, int $count, string $type, string $codingMode = 'auto'): array
     {
         $part1 = (int) ceil($count / 3);
         $part2 = (int) ceil($count / 3);
         $part3 = $count - ($part1 + $part2);
 
-        $q1 = $this->generateWithOfflineEngine($text, $part1, $type);
-        $q2 = $this->generateWithBloomTaxonomyEngine($text, $part2, $type);
-        $q3 = $this->generateWithCaseStudyEngine($text, $part3, $type);
+        $q1 = $this->generateWithOfflineEngine($text, $part1, $type, $codingMode);
+        $q2 = $this->generateWithBloomTaxonomyEngine($text, $part2, $type, $codingMode);
+        $q3 = $this->generateWithCaseStudyEngine($text, $part3, $type, $codingMode);
 
         $merged = array_merge($q1, $q2, $q3);
         // Distribusikan secara acak teratur

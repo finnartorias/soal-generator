@@ -145,6 +145,25 @@
         </div>
     </div>
 
+    <!-- Pilihan Mode Soal Kodingan -->
+    <div>
+        <label for="coding_mode" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1 flex items-center justify-between">
+            <span>Porsi Soal Kodingan / Pemrograman</span>
+            <span class="text-[10px] text-slate-500 font-normal">Pilihan Format</span>
+        </label>
+        <select id="coding_mode" name="coding_mode" class="w-full min-h-[42px] px-3 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 bg-white font-medium">
+            <option value="none" {{ old('coding_mode', $inputs['coding_mode'] ?? 'none') == 'none' ? 'selected' : '' }}>
+                ❌ Tanpa Kodingan (Teori & Konseptual Murni)
+            </option>
+            <option value="auto" {{ old('coding_mode', $inputs['coding_mode'] ?? 'none') == 'auto' ? 'selected' : '' }}>
+                ⚡ Otomatis (Campuran Teori & Tabel Kode jika Relevan)
+            </option>
+            <option value="code_only" {{ old('coding_mode', $inputs['coding_mode'] ?? 'none') == 'code_only' ? 'selected' : '' }}>
+                💻 Khusus Kodingan (100% Soal Tabel Kode Program & Debugging)
+            </option>
+        </select>
+    </div>
+
     <!-- Pilihan Mesin Pembuat Soal -->
     <div>
         <label for="model" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1 flex items-center justify-between">

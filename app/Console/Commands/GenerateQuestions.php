@@ -19,7 +19,8 @@ class GenerateQuestions extends Command
                             {--count=5 : Jumlah butir soal yang dibuat (1-100)}
                             {--type=all : Tipe soal (all, multiple_choice, essay)}
                             {--model=offline_engine : Pilihan mesin (offline_engine, bloom_engine, case_study_engine, hybrid_ensemble, lm_studio, atau nama model Ollama)}
-                            {--output= : Path output file hasil (.txt)}';
+                            {--coding-mode=auto : Mode kodingan (none, auto, code_only)}
+                            {--output= : Path output file hasil (.txt, .xlsx)}';
 
     /**
      * The console command description.
@@ -107,8 +108,10 @@ class GenerateQuestions extends Command
         $this->line("• Mesin yang digunakan: {$model}");
         $this->line("• Menerapkan filter Anti-Slop (Zero cliches, HOTS, plausible distractors)...");
 
+        $codingMode = $this->option('coding-mode') ?: 'auto';
+
         try {
-            $result = $generatorService->generate($materialText, $percent, $count, $type, $model);
+            $result = $generatorService->generate($materialText, $percent, $count, $type, $model, $codingMode);
         } catch (\Throwable $e) {
             $this->error("Gagal men-generate soal: " . $e->getMessage());
             return 1;
