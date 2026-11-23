@@ -243,7 +243,7 @@ class LocalSoalGeneratorService
             } elseif ($isEssay) {
                 $q = $this->craftEssayByAngle($currentSentence, $angle, $text);
             } else {
-                $q = $this->craftMCByAngle($currentSentence, $angle, $vocabulary, $text, $i + 1);
+                $q = $this->craftMCByAngle($currentSentence, $angle, $vocabulary, $text, $i + 1, $sentences);
             }
 
             $questions[] = $q;
@@ -287,7 +287,9 @@ class LocalSoalGeneratorService
             $sentence = $sentences[$i % count($sentences)];
             $level = $bloomLevels[$i % count($bloomLevels)];
             $clean = $this->cleanSentenceText($sentence);
-            $subject = $this->extractSubjectPhrase($sentence);
+            $factual = $this->extractFactualItem($sentence, $sentences);
+            $subject = $factual['subject'];
+            $correct = $factual['correct'];
 
             $isEssay = ($type === 'essay') || ($type === 'all' && ($i % 2 === 1));
 
@@ -302,32 +304,31 @@ class LocalSoalGeneratorService
 
             if ($isEssay) {
                 $prompt = match ($level['type']) {
-                    'understanding' => "Uraikan esensi konsep dari {$subject}! Jelaskan makna fundamentalnya dan bagaimana konsep ini saling melengkapi dengan elemen lain dalam materi!",
-                    'application' => "Berdasarkan prinsip {$subject}, rumuskan contoh situasi implementasi nyata di lapangan dan langkah konkret penerapannya!",
-                    'analysis' => "Lakukan analisis kritis mengenai faktor penyebab dan dampak yang muncul dari mekanisme {$subject}! Apa anomali yang terjadi jika komponen tersebut gagal berfungsi?",
-                    'evaluation' => "Evaluasilah efektivitas dan batasan operasional dari {$subject}! Berikan argumen penilaian dan solusi strategis untuk mengoptimalkannya!",
+                    'understanding' => "Berdasarkan materi yang dipelajari, jelaskan secara mendalam tentang '{$subject}' serta konsep dasarnya!",
+                    'application' => "Bagaimana penerapan konkret dari '{$subject}' berdasarkan penjelasan materi? Berikan contoh langkah penerapannya!",
+                    'analysis' => "Lakukan analisis mengenai hubungan dan dampak dari '{$subject}' berdasarkan isi materi pembelajaran!",
+                    'evaluation' => "Evaluasilah efektivitas dan batasan dari '{$subject}' berdasarkan kaidah yang diuraikan dalam materi!",
                 };
 
                 $questions[] = [
                     'type' => 'essay',
                     'question' => $prompt,
                     'options' => [],
-                    'correct_answer' => "Rubrik Evaluasi Kognitif ({$level['code']}): Peserta didik mengidentifikasi landasan teori, analisis mekanisme operasional, dan memberikan solusi atau justifikasi logis.",
-                    'explanation' => "Pembahasan Analitis: Jawaban merujuk pada materi: {$clean}. Analisis harus mencerminkan penalaran kognitif tingkat {$level['code']}.",
+                    'correct_answer' => "Inti Jawaban: {$clean}",
+                    'explanation' => "Pembahasan Analitis ({$level['code']}): Jawaban berpatokan langsung pada materi: {$clean}.",
                     'bloom_level' => $level['code'],
                     'source_snippet' => $sentence,
                 ];
             } else {
                 $qText = match ($level['type']) {
-                    'understanding' => "Dalam konteks materi pembelajaran, signifikansi konseptual dari {$subject} ditegaskan melalui...",
-                    'application' => "Jika prinsip {$subject} diimplementasikan secara langsung, hasil operasional yang ditargetkan adalah...",
-                    'analysis' => "Analisis hubungan sebab-akibat menunjukkan bahwa dinamika dalam proses {$subject} dipicu oleh...",
-                    'evaluation' => "Tolok ukur utama yang menentukan validitas dan keberhasilan pelaksanaan {$subject} adalah...",
+                    'understanding' => $factual['question_mc'],
+                    'application' => "Dalam konteks materi pembelajaran, penerapan yang tepat terkait {$subject} adalah...",
+                    'analysis' => "Analisis materi menunjukkan bahwa hal yang berkaitan erat dengan {$subject} adalah...",
+                    'evaluation' => "Pernyataan yang paling tepat mengenai {$subject} berdasarkan materi pembelajaran adalah...",
                 };
 
-                $correct = "Kesesuaian parameter fungsional sesuai aturan materi pembelajaran";
-                $distractors = $this->generatePlausibleDistractors($correct, $vocabulary, 4);
-                $questions[] = $this->buildMCObject($qText, $correct, $distractors, "Jawaban benar diturunkan langsung dari analisis konsep: {$clean}.", $level['code'], $sentence);
+                $distractors = $this->generateCorpusBasedDistractors($correct, $sentences, $vocabulary, 4);
+                $questions[] = $this->buildMCObject($qText, $correct, $distractors, "Jawaban benar diturunkan langsung dari isi materi: {$clean}.", $level['code'], $sentence);
             }
         }
 
@@ -360,8 +361,9 @@ class LocalSoalGeneratorService
         for ($i = 0; $i < $count; $i++) {
             $sentence = $sentences[$i % count($sentences)];
             $clean = $this->cleanSentenceText($sentence);
-            $subject = $this->extractSubjectPhrase($sentence);
-            $term = !empty($vocabulary) ? $vocabulary[$i % count($vocabulary)] : 'Komponen Terkait';
+            $factual = $this->extractFactualItem($sentence, $sentences);
+            $subject = $factual['subject'];
+            $correct = $factual['correct'];
 
             $isEssay = ($type === 'essay') || ($type === 'all' && ($i % 2 === 1));
 
@@ -375,23 +377,22 @@ class LocalSoalGeneratorService
             }
 
             if ($isEssay) {
-                $casePrompt = "STUDI KASUS #" . ($i + 1) . ":\nSebuah sistem operasional menerapkan mekanisme {$subject}. Dalam skenario di mana faktor eksternal mendisrupsi kinerja {$term}, rancanglah analisis penyebab masalah serta rencana mitigasi teknis yang tepat!";
+                $casePrompt = "STUDI KASUS #" . ($i + 1) . ":\nDalam skenario penerapan di dunia nyata terkait '{$subject}', uraikan analisis solusi yang tepat dengan berlandaskan pada prinsip materi: \"{$clean}\"!";
                 
                 $questions[] = [
                     'type' => 'essay',
                     'question' => $casePrompt,
                     'options' => [],
-                    'correct_answer' => "Rubrik Pemecahan Kasus: 1) Diagnosis masalah berdasarkan materi, 2) Solusi mitigasi terukur terkait {$subject}, 3) Indikator keberhasilan solusi.",
-                    'explanation' => "Pembahasan Kasus: Mengharuskan peserta didik mensintesis prinsip teoretis ke dalam pemecahan skenario nyata tanpa jawaban hafalan.",
+                    'correct_answer' => "Rubrik Pemecahan Kasus: Jawaban peserta didik merujuk pada materi bahwa {$clean}.",
+                    'explanation' => "Pembahasan Kasus: Mengharuskan peserta didik menghubungkan prinsip materi ke dalam pemecahan skenario nyata: {$clean}.",
                     'bloom_level' => 'C4 - Analisis Skenario & Mitigasi',
                     'source_snippet' => $sentence,
                 ];
             } else {
-                $caseStem = "SKENARIO: Pada evaluasi implementasi sistem yang menerapkan {$subject}, ditemukan anomali pada bagian {$term}. Langkah diagnosis analitis pertama yang paling tepat dilakukan adalah...";
-                $correct = "Memvalidasi kesesuaian parameter operasional dengan aturan teknis yang berlaku";
-                $distractors = $this->generatePlausibleDistractors($correct, $vocabulary, 4);
+                $caseStem = "SKENARIO: Pada evaluasi implementasi sistem atau konsep yang menerapkan {$subject}, kesimpulan faktual yang paling tepat menurut materi adalah...";
+                $distractors = $this->generateCorpusBasedDistractors($correct, $sentences, $vocabulary, 4);
 
-                $questions[] = $this->buildMCObject($caseStem, $correct, $distractors, "Tindakan terukur harus berlandaskan kaidah materi terkait: {$clean}.", "C3 - Pemecahan Masalah Skenario", $sentence);
+                $questions[] = $this->buildMCObject($caseStem, $correct, $distractors, "Tindakan terukur harus berlandaskan kaidah materi: {$clean}.", "C3 - Pemecahan Masalah Skenario", $sentence);
             }
         }
 
@@ -518,81 +519,224 @@ class LocalSoalGeneratorService
     }
 
     /**
-     * Helper pembuatan soal PG berdasarkan sudut pandang kognitif
+     * Mengekstraksi item faktual langsung dari kalimat materi:
+     * - Definisi: X adalah / merupakan / didefinisikan sebagai / yaitu / yakni Y
+     * - Fungsi / Peran: X berfungsi untuk / digunakan untuk / bertujuan untuk / bertugas untuk Y
+     * - Klasifikasi: X terdiri dari / meliputi / mencakup / terbagi menjadi Y
+     * - Sebab-Akibat: Jika / Apabila / Ketika X, maka Y
+     * - Pernyataan Faktual: [Subjek] [Predikat]
      */
-    protected function craftMCByAngle(string $sentence, string $angle, array $vocabulary, string $fullText, int $seed): array
+    public function extractFactualItem(string $sentence, array $allSentences = []): array
     {
         $clean = $this->cleanSentenceText($sentence);
-        $subject = $this->extractSubjectPhrase($sentence);
-        $bloom = 'C3 - Penerapan Konsep';
+        $cleanNoNumber = preg_replace('/^(?:bab\s+[0-9ivx]+|modul\s+[0-9ivx]+|[0-9]+\.|\([0-9]+\))\s*[:\.-]?\s*/ui', '', $clean);
+        $cleanNoNumber = trim($cleanNoNumber);
 
-        switch ($angle) {
-            case 'causality':
-                $qText = "Dalam alur sistem kerja, implikasi logis yang timbul dari penerapan {$subject} adalah...";
-                $correct = "Terbentuknya mekanisme operasional yang selaras dan terintegrasi secara konsisten";
-                $bloom = 'C4 - Analisis Kausalitas';
-                break;
-
-            case 'counterfactual':
-                $qText = "Jika mekanisme pada {$subject} mengalami kegagalan fungsi atau ditiadakan, dampak langsung yang terjadi adalah...";
-                $correct = "Terganggunya integritas proses dan penurunan keandalan fungsi sistem terkait";
-                $bloom = 'C4 - Analisis Kontrafaktual';
-                break;
-
-            case 'function':
-                $qText = "Dalam kerangka materi pembelajaran, peranan fungsional utama dari {$subject} ditujukan untuk...";
-                $correct = "Menjamin pemenuhan target operasional dan kepatuhan terhadap kaidah materi";
-                $bloom = 'C2 - Pemahaman Fungsional';
-                break;
-
-            case 'comparison':
-                $qText = "Karakteristik mendasar yang membedakan konsep {$subject} dari pendekatan konvensional adalah...";
-                $correct = "Fokus penekanan pada parameter esensial dan efisiensi struktur proses";
-                $bloom = 'C3 - Diferensiasi Konseptual';
-                break;
-
-            case 'application':
-                $qText = "Ketika prinsip {$subject} diterapkan dalam kondisi operasional nyata, prioritas utama yang harus dipastikan adalah...";
-                $correct = "Kesesuaian parameter fungsional dengan aturan dan standar teknis yang berlaku";
-                $bloom = 'C3 - Penerapan Prinsip';
-                break;
-
-            default:
-                $qText = "Berdasarkan kaidah materi pembelajaran, simpulan analitis yang paling tepat mengenai {$subject} adalah...";
-                $correct = "Penguatan fondasi mekanisme sistem melalui koordinasi elemen yang terstruktur";
-                $bloom = 'C2 - Penalaran Konseptual';
-                break;
+        // 1. Pola Definisi
+        if (preg_match('/^(.+?)\s+(adalah|merupakan|yaitu|yakni|didefinisikan sebagai)\s+(.+)$/ui', $cleanNoNumber, $m)) {
+            $subject = trim($m[1]);
+            $predicate = trim($m[3]);
+            if (mb_strlen($subject) >= 2 && mb_strlen($predicate) >= 4) {
+                return [
+                    'type' => 'definition',
+                    'subject' => $subject,
+                    'correct' => ucfirst($predicate),
+                    'question_mc' => "Berdasarkan materi yang diberikan, apa yang dimaksud dengan {$subject}?",
+                    'question_essay' => "Jelaskan definisi dan pengertian dari '{$subject}' sesuai dengan materi pembelajaran!",
+                    'bloom' => 'C2 - Pemahaman Konsep',
+                    'explanation' => "Definisi langsung dari materi: {$clean}.",
+                ];
+            }
         }
 
-        $distractors = $this->generatePlausibleDistractors($correct, $vocabulary, 4);
-        return $this->buildMCObject($qText, $correct, $distractors, "Jawaban benar diturunkan langsung dari analisis konsep materi: {$clean}.", $bloom, $sentence);
+        // 2. Pola Fungsi / Peran
+        if (preg_match('/^(.+?)\s+(berfungsi untuk|berfungsi sebagai|digunakan untuk|bertujuan untuk|bertugas untuk|berperan dalam)\s+(.+)$/ui', $cleanNoNumber, $m)) {
+            $subject = trim($m[1]);
+            $predicate = trim($m[3]);
+            if (mb_strlen($subject) >= 2 && mb_strlen($predicate) >= 4) {
+                return [
+                    'type' => 'function',
+                    'subject' => $subject,
+                    'correct' => ucfirst($predicate),
+                    'question_mc' => "Berdasarkan materi yang dipelajari, fungsi utama atau peran dari {$subject} adalah...",
+                    'question_essay' => "Uraikan fungsi dan peran '{$subject}' sebagaimana dijelaskan dalam materi!",
+                    'bloom' => 'C2 - Pemahaman Fungsional',
+                    'explanation' => "Fungsi/peranan sesuai materi: {$clean}.",
+                ];
+            }
+        }
+
+        // 3. Pola Klasifikasi / Komponen
+        if (preg_match('/^(.+?)\s+(terdiri dari|meliputi|mencakup|terbagi menjadi|dikelompokkan menjadi)\s+(.+)$/ui', $cleanNoNumber, $m)) {
+            $subject = trim($m[1]);
+            $predicate = trim($m[3]);
+            if (mb_strlen($subject) >= 2 && mb_strlen($predicate) >= 4) {
+                return [
+                    'type' => 'classification',
+                    'subject' => $subject,
+                    'correct' => ucfirst($predicate),
+                    'question_mc' => "Berdasarkan pemaparan materi, komponen atau cakupan dari {$subject} meliputi...",
+                    'question_essay' => "Sebutkan dan jelaskan pembagian atau komponen dari '{$subject}' berdasarkan materi pembelajaran!",
+                    'bloom' => 'C2 - Klasifikasi Materi',
+                    'explanation' => "Klasifikasi langsung dari materi: {$clean}.",
+                ];
+            }
+        }
+
+        // 4. Pola Sebab-Akibat / Kondisional
+        if (preg_match('/^(jika|apabila|ketika|saat)\s+(.+?),\s*(?:maka\s+)?(.+)$/ui', $cleanNoNumber, $m)) {
+            $condition = trim($m[2]);
+            $consequence = trim($m[3]);
+            if (mb_strlen($condition) >= 4 && mb_strlen($consequence) >= 4) {
+                return [
+                    'type' => 'causality',
+                    'subject' => $condition,
+                    'correct' => ucfirst($consequence),
+                    'question_mc' => "Berdasarkan materi, apa yang terjadi ketika {$condition}?",
+                    'question_essay' => "Jelaskan dampak atau konsekuensi yang timbul ketika {$condition} menurut penjelasan materi!",
+                    'bloom' => 'C4 - Analisis Kausalitas',
+                    'explanation' => "Hubungan sebab-akibat dari materi: {$clean}.",
+                ];
+            }
+        }
+
+        // 5. Fakta Umum (Pemisahan Subjek & Predikat kalimat asli)
+        $subject = $this->extractSubjectPhrase($cleanNoNumber);
+        $pred = $cleanNoNumber;
+        if (mb_stripos($cleanNoNumber, $subject) === 0) {
+            $pred = trim(mb_substr($cleanNoNumber, mb_strlen($subject)));
+            $pred = ltrim($pred, " ,;:-");
+        }
+        if (mb_strlen($pred) < 8) {
+            $pred = $cleanNoNumber;
+        }
+
+        return [
+            'type' => 'general_fact',
+            'subject' => $subject,
+            'correct' => ucfirst($pred),
+            'question_mc' => "Pernyataan yang tepat mengenai '{$subject}' berdasarkan isi materi adalah...",
+            'question_essay' => "Berdasarkan materi yang dipelajari, uraikan pokok bahasan yang berkaitan dengan '{$subject}'!",
+            'bloom' => 'C3 - Penalaran Materi',
+            'explanation' => "Merujuk langsung pada fakta materi: {$clean}.",
+        ];
     }
 
     /**
-     * Helper pembuatan soal Essay berdasarkan sudut pandang kognitif
+     * Menghasilkan pilihan pengecoh (distractor) yang diambil langsung dari fakta/kalimat lain
+     * di dalam materi yang diberikan user, sehingga bukan kalimat acak atau robotik.
+     */
+    public function generateCorpusBasedDistractors(string $correctAnswer, array $allSentences, array $vocabulary, int $count = 4): array
+    {
+        $distractors = [];
+        $correctLower = mb_strtolower(trim($correctAnswer));
+
+        // Prioritas 1: Ambil jawaban dari kalimat-kalimat lain dalam materi yang sama
+        foreach ($allSentences as $otherSentence) {
+            $otherFactual = $this->extractFactualItem($otherSentence);
+            $candidate = trim($otherFactual['correct']);
+            $candidateLower = mb_strtolower($candidate);
+
+            if ($candidateLower !== $correctLower && !in_array($candidate, $distractors) && mb_strlen($candidate) >= 6) {
+                // Hindari jika kemiripan kata terlalu tinggi dengan jawaban benar
+                similar_text($candidateLower, $correctLower, $percent);
+                if ($percent < 75) {
+                    $distractors[] = $candidate;
+                }
+            }
+
+            if (count($distractors) >= $count) {
+                break;
+            }
+        }
+
+        // Prioritas 2: Jika materi pendek, kombinasikan kosakata materi menjadi opsi yang masuk akal
+        if (count($distractors) < $count) {
+            $words = !empty($vocabulary) ? $vocabulary : ['Komponen', 'Stabilitas', 'Sistem', 'Data', 'Proses'];
+            shuffle($words);
+
+            $templates = [
+                "Hanya berfokus pada ruang lingkup %s secara terisolasi",
+                "Membatasi pengolahan data %s pada tahap inisialisasi",
+                "Menerapkan prosedur konvensional tanpa menyertakan %s",
+                "Memerlukan pemisahan total seluruh parameter %s dari alur kerja",
+                "Mengabaikan integrasi komponen %s dalam struktur operasional",
+            ];
+
+            foreach ($templates as $tpl) {
+                $term = array_shift($words) ?? 'elemen terkait';
+                $candidate = sprintf($tpl, $term);
+                if ($candidate !== $correctAnswer && !in_array($candidate, $distractors)) {
+                    $distractors[] = $candidate;
+                }
+                if (count($distractors) >= $count) {
+                    break;
+                }
+            }
+        }
+
+        return array_slice($distractors, 0, $count);
+    }
+
+    /**
+     * Helper pembuatan soal PG berdasarkan sudut pandang kognitif langsung dari materi
+     */
+    protected function craftMCByAngle(string $sentence, string $angle, array $vocabulary, string $fullText, int $seed, array $allSentences = []): array
+    {
+        $clean = $this->cleanSentenceText($sentence);
+        $factual = $this->extractFactualItem($sentence, $allSentences);
+        $subject = $factual['subject'];
+        $correct = $factual['correct'];
+        $bloom = $factual['bloom'];
+
+        if ($factual['type'] !== 'general_fact') {
+            $qText = $factual['question_mc'];
+        } else {
+            switch ($angle) {
+                case 'causality':
+                    $qText = "Dalam konteks materi pembelajaran, keterkaitan atau dampak logis mengenai '{$subject}' adalah...";
+                    break;
+                case 'function':
+                    $qText = "Berdasarkan pemaparan materi, hal yang paling berkaitan dengan '{$subject}' adalah...";
+                    break;
+                case 'counterfactual':
+                    $qText = "Berdasarkan penjelasan materi, fakta mendasar mengenai '{$subject}' ditunjukkan oleh...";
+                    break;
+                default:
+                    $qText = $factual['question_mc'];
+                    break;
+            }
+        }
+
+        $distractors = $this->generateCorpusBasedDistractors($correct, $allSentences, $vocabulary, 4);
+        return $this->buildMCObject($qText, $correct, $distractors, "Jawaban benar diturunkan langsung dari materi: {$clean}.", $bloom, $sentence);
+    }
+
+    /**
+     * Helper pembuatan soal Essay langsung dari materi
      */
     protected function craftEssayByAngle(string $sentence, string $angle, string $fullText): array
     {
         $clean = $this->cleanSentenceText($sentence);
-        $subject = $this->extractSubjectPhrase($sentence);
+        $factual = $this->extractFactualItem($sentence);
+        $subject = $factual['subject'];
 
         $prompts = [
-            "causality" => "Uraikan hubungan sebab-akibat dalam penerapan {$subject}! Bagaimana mekanisme ini memengaruhi stabilitas dan keterpaduan keseluruhan sistem materi?",
-            "counterfactual" => "Lakukan analisis dampak: Apa konsekuensi teknis jika proses pada {$subject} mengalami kegagalan fungsi dalam situasi riil? Berikan langkah mitigasi yang tepat!",
-            "function" => "Jelaskan peran esensial dan signifikansi strategis dari konsep {$subject} dalam konteks materi pembelajaran!",
-            "comparison" => "Bandingkan karakteristik implementasi {$subject} dengan alternatif pendekatan lainnya! Jelaskan mengapa prinsip tersebut dipandang krusial!",
-            "application" => "Rumuskan skenario implementasi konkret dari prinsip {$subject}! Langkah-langkah strategis apa yang harus diambil untuk menjamin keberhasilannya?",
+            "causality" => "Uraikan hubungan sebab-akibat yang berkaitan dengan '{$subject}' berdasarkan isi materi yang telah dipelajari!",
+            "function" => "Jelaskan fungsi, peranan, atau manfaat utama dari '{$subject}' sebagaimana dijelaskan dalam materi!",
+            "comparison" => "Berdasarkan materi yang dipelajari, analisislah karakteristik dan ruang lingkup dari '{$subject}'!",
+            "application" => "Bagaimanakah penerapan prinsip '{$subject}' sesuai dengan penjelasan materi pembelajaran?",
         ];
 
-        $qText = $prompts[$angle] ?? "Analisislah secara kritis mekanisme fundamental dari {$subject}! Jelaskan signifikansinya dalam mendukung efektivitas materi!";
+        $qText = $prompts[$angle] ?? $factual['question_essay'];
 
         return [
             'type' => 'essay',
             'question' => $qText,
             'options' => [],
-            'correct_answer' => 'Rubrik Penilaian: 1) Pemahaman konsep dasar, 2) Alur mekanisme penalaran logis, 3) Contoh analisis atau solusi teknis terukur.',
-            'explanation' => "Pembahasan Analitis: Jawaban komprehensif mengacu pada inti materi: {$clean}.",
-            'bloom_level' => 'C4 - Analisis Kritis',
+            'correct_answer' => "Kunci Pokok Jawaban: {$clean}",
+            'explanation' => "Pembahasan: Jawaban peserta didik mengacu langsung pada penjelasan materi: {$clean}.",
+            'bloom_level' => $factual['bloom'] ?? 'C4 - Analisis Kritis',
             'source_snippet' => $sentence,
         ];
     }
