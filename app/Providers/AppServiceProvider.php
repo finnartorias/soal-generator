@@ -20,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Enforce HTTPS & Konfigurasi Session File di Vercel Serverless
+        // Enforce HTTPS & Konfigurasi Session Cookie di Vercel Serverless
         if (
             app()->environment('production') ||
             (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
@@ -28,8 +28,7 @@ class AppServiceProvider extends ServiceProvider
         ) {
             URL::forceScheme('https');
             config([
-                'session.driver' => 'file',
-                'session.files' => '/tmp/storage/framework/sessions',
+                'session.driver' => 'cookie',
             ]);
         }
     }
